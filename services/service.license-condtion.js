@@ -8,7 +8,7 @@ AWS.config.update({region: 'us-east-1'});
 // });
 
 var docClient = new AWS.DynamoDB.DocumentClient();
-var table = "license-condition";
+var table = "LicenseCondition";
 
 /* static customer service class */
 class licenseConditionService
@@ -29,13 +29,6 @@ class licenseConditionService
 				"possessionLimitsNitrogen": "9587",
 				"possessionLimitsOxygen": "BBSR",
 				"possessionLimitsCarbon": "Bhabani",
-				"applicationFee": "OR",
-				"applicationFeeDate": "9587",
-				"amendmentFee": "BBSR",
-				"amendmentFeeDate": "Bhabani",
-				"annualFee": "OR",
-				"annualFeeDate": "9587",
-				"nonroutineInspectionFee": "BBSR",
 				"feePaymentInstruction": "Bhabani",
 				"lastFeeDate": "OR",
 				"rso": "9587",
@@ -66,7 +59,7 @@ class licenseConditionService
 			var params = {
 				TableName: table,
 				Key:{
-					"licenseCondition_Id": license_id,
+					"licenseNumber": license_id,
 				}
 			};
 			console.log("reading a new item...");
@@ -74,13 +67,13 @@ class licenseConditionService
 				if (err) {
 					console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
 				} else {
-					return JSON.stringify(data, null, 2);
+					return data;
 				}
 			});
 		}
 		else
 		{
-			throw new Error('Unable to retrieve a licenseCondition by (licenseCondition_Id:'+ licenseCondition_Id +')');
+			throw new Error('Unable to retrieve a licenseCondition by (licenseCondition_Id:'+ license_id +')');
 		}
 	}
 
@@ -88,12 +81,11 @@ class licenseConditionService
 	{
 		var params = {
 			TableName: table,
-			// Key:{
-			// 	"licenseCondition_Id": license_id,
-			// }
+		    ReturnConsumedCapacity: "TOTAL",
+			// ProjectionExpression: "Artist, Title", // retrive all with these columns only
 		};
 		console.log("reading a new item...");
-		docClient.get(params, function(err, data) {
+		docClient.scan(params, function(err, data) {
 			if (err) {
 				console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
 			} else {
