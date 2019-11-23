@@ -6,6 +6,7 @@ var http = require('http');
 
 var licenseCondition = require('./routes/license-conditions');
 var reportType = require('./routes/lc-report-type');
+var shuiTest = require('./routes/shui-test.router');
 var paymentType = require('./routes/lc-payment-type');
 var debug = require('debug')('ehs-api:server');
 
@@ -23,6 +24,7 @@ app.use(function(req, res, next) {
 
 app.use('/api/v1/licenseCondition', licenseCondition);
 app.use('/api/v1/reportType', reportType);
+app.use('/api/v1/shuiTest', shuiTest);
 // app.use('/api/v1/paymentType', paymentType);
 
 app.set('port', port);
