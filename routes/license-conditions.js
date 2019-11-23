@@ -20,14 +20,14 @@ router.post('/', async (req, res, next) =>
 
 	try
 	{
-        // var licenseConditionService = require('../services/service.license-condtion');
+    // var licenseConditionService = require('../services/service.license-condtion');
 		// const licenseCondition = await licenseConditionService.create(body);
 
 		// if(body.guid != null)
 		// {
 		// 	licenseCondition.guid = body.guid;
 		// }
-		// // created the licenseCondition! 
+		// // created the licenseCondition!
 		// return res.status(201).json({ licenseCondition: licenseCondition });
 
 
@@ -58,17 +58,46 @@ router.post('/', async (req, res, next) =>
 				"otherRequirements":  body.otherRequirements,
 			}
 		};
-		
+
 		console.log("Adding a new LicenseCondition...");
 		docClient.put(params, function(err, data) {
 			if (err) {
 				console.error("Unable to add LicenseCondition. Error JSON:", JSON.stringify(err, null, 2));
 			} else {
-				console.log(data);
-				return JSON.stringify(data, null, 2);
+				res.setHeader('Content-Type', 'application/json');
+				var jsonObject = JSON.stringify({
+					licenseNumber: data.Item.licenseNumber,
+					licenseType: data.Item.licenseType,
+					siteLocation: data.Item.siteLocation,
+					issueDate: data.Item.issueDate,
+					expirationDate: data.Item.expirationDate,
+					renewalDate: data.Item.renewalDate,
+					possessionLimitsFlourine: data.Item.possessionLimitsFlourine,
+					possessionLimitsNitrogen: data.Item.possessionLimitsNitrogen,
+					possessionLimitsOxygen: data.Item.possessionLimitsOxygen,
+					possessionLimitsCarbon: data.Item.possessionLimitsCarbon,
+					reports: data.Item.reports,
+					feeType:  data.Item.feeType,
+					feePaymentInstruction: data.Item.feePaymentInstruction,
+					lastFeeDate: data.Item.lastFeeDate,
+					rso: data.Item.rso,
+					authorizedNuclearPharmacist: data.Item.authorizedNuclearPharmacist,
+					authorizedUser: data.Item.authorizedUser,
+					cyclotronOperator: data.Item.cyclotronOperator,
+					physicalPresenceRequirement: data.Item.physicalPresenceRequirement,
+					sealedSourceLeakTest: data.Item.sealedSourceLeakTest,
+					sealedSourceInventory: data.Item.sealedSourceInventory,
+					otherRequirements: data.Item.otherRequirements,
+				 }, null, 2);
+
+				 res.send({
+					 success: true,
+					 code: 200,
+					 data :jsonObject
+				});
+
 			}
 		});
-
 
 	}
 	catch(err)
@@ -77,9 +106,6 @@ router.post('/', async (req, res, next) =>
 		{
         	return res.status(400).json({ error: err.message });
 		}
-
-		// unexpected error
-		return next(err);
 	}
 });
 
@@ -102,7 +128,7 @@ try{
 					console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
 				} else {
 					res.setHeader('Content-Type', 'application/json');
-					res.end(JSON.stringify({ 
+					res.end(JSON.stringify({
 						licenseNumber: data.Item.licenseNumber,
 						licenseType: data.Item.licenseType,
 						siteLocation: data.Item.siteLocation,
@@ -125,7 +151,6 @@ try{
 						sealedSourceLeakTest: data.Item.sealedSourceLeakTest,
 						sealedSourceInventory: data.Item.sealedSourceInventory,
 						otherRequirements: data.Item.otherRequirements,
-						
 					 }, null, 2));
 				}
 			});
@@ -137,7 +162,7 @@ try{
    }
 	catch(err)
 	{
-		return next(err);
+		return res.status(400).json({ error: err.message });
 	}
 
 });
@@ -145,15 +170,63 @@ try{
 /* retrieves retrieveAllLicense */
 router.get('/', async (req, res, next) =>
 {
-	try
-	{
-		const licenseCondition = await licenseConditionService.retrieveAllLicense();
-		return res.json({ licenseCondition: licenseCondition });
-	}
-	catch(err)
-	{
-		return next(err);
-	}
+	try{
+
+				var params = {
+					TableName: table,
+					Key:{
+						"licenseNumber": req.params.id,
+					}
+				};
+				console.log("reading a multiple license item...");
+				docClient.get(params, function(err, data) {
+					if (err) {
+						console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+					} else {
+						res.setHeader('Content-Type', 'application/json');
+						var jsonObject={};
+						var key = 'Item';
+						jsonObject[key] = [];
+						for (var i = 0; i < data.Item.length; i++) {
+								console.log("licenseNumber is :" + data.Item[i].licenseNumber);
+								var details={
+										licenseNumber: data.Item[i].licenseNumber,
+										licenseType: data.Item[i].licenseType,
+										siteLocation: data.Item[i].siteLocation,
+										issueDate: data.Item[i].issueDate,
+										expirationDate: data.Item[i].expirationDate,
+										renewalDate: data.Item[i].renewalDate,
+										possessionLimitsFlourine: data.Item[i].possessionLimitsFlourine,
+										possessionLimitsNitrogen: data.Item[i].possessionLimitsNitrogen,
+										possessionLimitsOxygen: data.Item[i].possessionLimitsOxygen,
+										possessionLimitsCarbon: data.Item[i].possessionLimitsCarbon,
+										reports: data.Item[i].reports,
+										feeType:  data.Item[i].feeType,
+										feePaymentInstruction: data.Item[i].feePaymentInstruction,
+										lastFeeDate: data.Item[i].lastFeeDate,
+										rso: data.Item[i].rso,
+										authorizedNuclearPharmacist: data.Item[i].authorizedNuclearPharmacist,
+										authorizedUser: data.Item[i].authorizedUser,
+										cyclotronOperator: data.Item[i].cyclotronOperator,
+										physicalPresenceRequirement: data.Item[i].physicalPresenceRequirement,
+										sealedSourceLeakTest: data.Item[i].sealedSourceLeakTest,
+										sealedSourceInventory: data.Item[i].sealedSourceInventory,
+										otherRequirements: data.Item[i].otherRequirements,
+								};
+								jsonObject[key].push(details);
+						}
+						res.send({
+								success: true,
+								code: 200,
+								data :JSON.stringify(jsonObject)
+						});
+					}
+				});
+	   }
+		catch(err)
+		{
+			return res.status(400).json({ error: err.message });
+		}
 });
 
 /* updates the licenseCondition by uid */
@@ -167,8 +240,7 @@ router.put('/:id', async (req, res, next) =>
 	}
 	catch(err)
 	{
-		// unexpected error
-		return next(err);
+		return res.status(400).json({ error: err.message });
 	}
 });
 
@@ -183,8 +255,7 @@ router.delete('/:id', async (req, res, next) =>
 	}
 	catch(err)
 	{
-		// unexpected error
-		return next(err);
+			return res.status(400).json({ error: err.message });
 	}
 });
 
